@@ -1,0 +1,21 @@
+https://www.adamhartwig.co.uk/ 左黄右紫主页 技能页用岩点 点上有技能
+
+
+https://p5aholic.me/
+
+https://www.onyedika.xyz/
+
+
+oh well if you’re looking for practice, i did a site with Gatsby.js. Super simple but still modern and there are templates for a place to start. you can host it for free with netlify which gives you your own CI/CD pipeline. a great intro into modern web development practices
+https://sumanthsamala.com/skills
+
+https://www.cassie.codes/
+
+
+https://www.jesse-zhou.com/
+https://vanholtz.co/
+Frontend: HTML, CSS, JavaScript, React (Redux), Vite
+Backend: Java (basic), Python (Django – basic), JavaScript (Node.js, Express)
+Database: MySQL, MongoDB
+Cloud & DevOps: Docker, CI/CD
+Version Control: Git, GitHub
