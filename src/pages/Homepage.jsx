@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import '../App.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function Homepage() {
   const [stage, setStage] = useState(1); // 1~4
   const [running, setRunning] = useState(false);
+  const navigate = useNavigate();
 
   // ===== Stage-3 typing =====
   const CODE_TEXT = `while (alive) {
@@ -13,8 +15,8 @@ export default function Homepage() {
   keepCoding();
   keepGoing();
 }`;
-  const TYPE_SPEED_MS = 60; // 打字速度（可调）
-  const AFTER_TYPE_PAUSE_MS = 700; // 打完后停留一下再进 stage4
+  const TYPE_SPEED_MS = 35; // 打字速度
+  const AFTER_TYPE_PAUSE_MS = 900; // 打完后停留一下再进 stage4
 
   const [typed, setTyped] = useState('');
   const typingTimerRef = useRef(null);
@@ -41,6 +43,10 @@ export default function Homepage() {
   const clearTypingTimer = () => {
     if (typingTimerRef.current) window.clearInterval(typingTimerRef.current);
     typingTimerRef.current = null;
+  };
+
+  const go = (path) => {
+    navigate(path);
   };
 
   useEffect(() => {
@@ -209,8 +215,63 @@ export default function Homepage() {
         </>
       )}
 
-      {/* stage4 空屏 —— 保留 */}
-      <div className="stage4-empty" aria-hidden={stage !== 4} />
+      {/* stage4 内容 */}
+      <div className={`stage4 ${stage === 4 ? 'is-active' : ''}`} aria-hidden={stage !== 4}>
+        <div className="stage4-frame">
+          {/* 顶部条 */}
+          <header className="stage4-top">
+            <div className="stage4-top-left" />
+            <div className="stage4-top-right">
+              {/* 三个点：纯装饰（模拟IDE/系统壳层） */}
+              <div className="stage4-dots" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+            </div>
+          </header>
+
+          {/* 中间主体 */}
+          <main className="stage4-main">
+            {/* 左侧引用 */}
+            <section className="stage4-quote">
+              <p className="q1">凡算力所及，皆为牢笼；</p>
+              <p className="q2">凡算力不及，即为漏洞。</p>
+            </section>
+
+            {/* 右侧大字导航 */}
+            <section className="stage4-hero">
+              <button className="stage4-hero-link" onClick={() => go('/skills-and-hobbies')}>
+                / 项目
+              </button>
+
+              <button className="stage4-hero-link" onClick={() => go('/projects')}>
+                / 技能和爱好
+              </button>
+            </section>
+          </main>
+
+          {/* 底部条 */}
+          <footer className="stage4-bottom">
+            <div className="stage4-bottom-left">
+              <div className="stage4-bottom-inner left">
+                <div className="stage4-june">JUNE</div>
+
+                <div className="stage4-roles">
+                  <div>软件开发</div>
+                  <div>软件测试</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="stage4-bottom-divider" />
+
+            <div className="stage4-bottom-right">
+              <div className="stage4-bottom-inner right">mJune_Jiang@outlook.com</div>
+            </div>
+          </footer>
+        </div>
+      </div>
     </div>
   );
 }
