@@ -702,30 +702,62 @@ body {
   cursor: pointer;
   text-align: right;
 
-  font-size: clamp(44px, 6.5vw, 96px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
   font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
   white-space: nowrap;
 
-  color: #111;
-  -webkit-text-stroke: 0 transparent;
-
   transform: skewY(-8deg);
-  transition: color 200ms ease, -webkit-text-stroke 200ms ease, transform 200ms ease;
+  transition: color 200ms ease,
+              -webkit-text-stroke 200ms ease,
+              transform 200ms ease;
+}
+
+/* 中文主标题 */
+.stage4-hero-link .hero-cn {
+  font-size: clamp(44px, 6.5vw, 96px);
+  color: #111;
+  line-height: 1;
+}
+
+/* 英文副标题：半字号 + 轻微叠压 */
+.stage4-hero-link .hero-en {
+  font-size: 1.5em;                /* ✅ 中文的一半 */
+  margin-top: -0.15em;             /* ✅ 轻微重合（关键） */
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  text-transform: uppercase;
+
+  color: rgba(0, 0, 0, 0.35);       /* ✅ 推荐色 */
+}
+
+/* hover：整体中空（英文也一起） */
+.stage4-hero-link:hover .hero-cn,
+.stage4-hero-link:focus-visible .hero-cn {
+  color: transparent;
+  -webkit-text-stroke: clamp(2px, 0.25vw, 3px) #111;
+}
+
+.stage4-hero-link:hover .hero-en,
+.stage4-hero-link:focus-visible .hero-en {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(0,0,0,0.35);
 }
 
 .stage4-hero-link:hover,
 .stage4-hero-link:focus-visible {
   outline: none;
-  color: transparent;
-  -webkit-text-stroke: clamp(2px, 0.25vw, 3px) #111;
   transform: skewY(-8deg) translateX(6px);
 }
 
+
 /* 底部：高度随窗口高度缩放，右侧宽度也缩放 */
 .stage4-bottom {
-  height: clamp(84px, 12vh, 120px);
+  height: clamp(90px, 15vh, 120px);
   border-top: 1px solid rgba(0,0,0,0.35);
   display: grid;
   grid-template-columns: 1fr 1px clamp(260px, 28vw, 420px);
