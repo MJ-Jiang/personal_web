@@ -1,66 +1,62 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import NebulaCanvas from './NebulaCanvas';
 
 export default function Stage4({ stage, go }) {
+  const frameRef = useRef(null);
+  const leftRef = useRef(null);
+
   return (
     <div className={`stage4 ${stage === 4 ? 'is-active' : ''}`} aria-hidden={stage !== 4}>
-      <div className="stage4-frame">
-        {/* 顶部条 */}
-        <header className="stage4-top">
-          <div className="stage4-top-left" />
-          <div className="stage4-top-right">
-            {/* 三个点：纯装饰 */}
-            <div className="stage4-dots" aria-hidden="true">
-              <span />
-              <span />
-              <span />
-            </div>
-          </div>
-        </header>
+      <div ref={frameRef} className="stage4-frame stage4-frame--boxed">
 
-        {/* 中间主体 */}
-        <main className="stage4-main">
-          {/* 左侧引用 */}
-          <section className="stage4-quote">
-            <p className="q1">凡算力所及，皆为牢笼；</p>
-            <p className="q2">凡算力不及，即为漏洞。</p>
-          </section>
+        {/* ✅ 星云：不影响交互（canvas 在内容下面） */}
+        <NebulaCanvas
+          active={stage === 4}
+          frameRef={frameRef}
+          leftRef={leftRef}
+        />
 
-          {/* 右侧大字导航 + 英文 */}
-          <section className="stage4-hero">
-            <button className="stage4-hero-link" onClick={() => go('/projects')}>
-              <span className="hero-cn">/ 项目</span>
-              <span className="hero-en">PROJECTS</span>
-            </button>
+        {/* 左侧信息 */}
+        <section ref={leftRef} className="stage4-left">
+          <div className="stage4-left__name">June</div>
 
-            <button className="stage4-hero-link" onClick={() => go('/skills-and-hobbies')}>
-              <span className="hero-cn">/ 技能和爱好</span>
-              <span className="hero-en">SKILLS AND HOBBIES</span>
-            </button>
-          </section>
-        </main>
+          <div className="stage4-left__line">软件开发　软件测试</div>
 
-        {/* 底部条 */}
-        <footer className="stage4-bottom">
-          <div className="stage4-bottom-left">
-            <div className="stage4-bottom-inner left">
-              <div className="stage4-june">JUNE</div>
-
-              <div className="stage4-roles">
-                <div>软件开发</div>
-                <div>软件测试</div>
-              </div>
-            </div>
+          <div className="stage4-left__line">
+            <a className="stage4-left__link" href="mailto:mJune_Jiang@outlook.com">
+              mJune_Jiang@outlook.com
+            </a>
           </div>
 
-          <div className="stage4-bottom-divider" />
-
-          <div className="stage4-bottom-right">
-            <div className="stage4-bottom-inner right">
-              <div>mJune_Jiang@outlook.com</div>
-              <div>https://github.com/MJ-Jiang</div>
-            </div>
+          <div className="stage4-left__line">
+            <a
+              className="stage4-left__link"
+              href="https://github.com/MJ-Jiang"
+              target="_blank"
+              rel="noreferrer"
+            >
+              https://github.com/MJ-Jiang
+            </a>
           </div>
-        </footer>
+        </section>
+
+        {/* 右侧导航 */}
+        <section className="stage4-right" aria-label="导航">
+          <button className="stage4-item" onClick={() => go('/projects/resourcehub')}>
+            <span className="item-cn">明星资源站</span>
+            <span className="item-en">2026.01 · Web Full-stack</span>
+          </button>
+
+          <button className="stage4-item" onClick={() => go('/projects/wechatycy')}>
+            <span className="item-cn">答案之书</span>
+            <span className="item-en">2025.07 · 微信小程序</span>
+          </button>
+
+          <button className="stage4-item" onClick={() => go('/skills-and-hobbies')}>
+            <span className="item-cn">技能和爱好</span>
+            <span className="item-en">Skills and Hobbies</span>
+          </button>
+        </section>
       </div>
     </div>
   );
