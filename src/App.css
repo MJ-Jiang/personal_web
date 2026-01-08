@@ -56,7 +56,7 @@ body {
 /* stage-4：只要底色 + 空屏 */
 
 .app.stage-4 {
-  background: var(--code-1);
+ background: var(--code-3); 
   color: #141414;
 }
 
@@ -641,18 +641,25 @@ body {
   align-self: end;
 }
 
-.stage4-footer__inner{
+.stage4-footer__inner {
   display: inline-block;
-  transform-origin: left bottom;
-  transform: perspective(600px) rotateX(22deg);
-  /* 嵌入感：凹印 */
-  color: rgba(255,253,245,0.55);
-  text-shadow:
-    0 1px 0 rgba(0,0,0,0.24),
-    0 -1px 0 rgba(255,255,255,0.14);
+
+  /* ✅ 整块背景（你指定的颜色） */
+  background:var(--code-2);
+
+  /* ✅ 包住文字 */
+  padding: 0.5em 0.8em;
+
+  color: rgba(0, 0, 0, 0.36);
+
+
   letter-spacing: 0.08em;
   line-height: 1.7;
+
+  border-radius: 6px;
+    font-size: clamp(10px, 1vw, 13px);
 }
+
 
 
 .stage4-nebula {
@@ -699,21 +706,22 @@ body {
   align-self: start;
   justify-self: start;
   max-width: 520px;
-  background: #2b2b26;
-
+  background: var(--code-1);
+  color:aliceblue;
   padding: clamp(18px, 3vw, 32px)
            clamp(22px, 3.6vw, 42px);
   border-radius: 6px;
 
+
   /* 让内容不要贴边 */
   box-sizing: border-box;
-   color: var(--code-1);
+
 }
 
 .stage4-left__name {
   font-size: clamp(28px, 5vw, 80px);
   font-weight: 900;
-  letter-spacing: 0.02em;
+
   font-family:
     Avenir,
     'Avenir Next',
@@ -724,6 +732,7 @@ body {
   font-weight: 900;
   line-height: 1;
   margin-bottom: clamp(6px, 1.2h, 10px);
+    color:aliceblue;
 }
 .stage4-left__line:first-of-type {
   margin-top: -2px;
@@ -734,22 +743,38 @@ body {
   margin-top: 6px;
   font-weight: 600;
   display: flex;
+    color:aliceblue;
+     font-family:
+    Avenir,
+    'Avenir Next',
+    'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 .stage4-left__link {
   text-decoration: none;
   font-size: clamp(10px, 1vw, 13px);
   overflow: hidden;
+    color:aliceblue;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease;
+     font-family:
+    Avenir,
+    'Avenir Next',
+    'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 .stage4-left__link,
 .stage4-left__link:visited,
 .stage4-left__link:hover,
 .stage4-left__link:active {
-  color: var(--code-1);
+  color: inherit;
 }
 .stage4-left__link {
   display: inline-block; /* ✅ 关键 1 */
@@ -794,8 +819,7 @@ body {
   letter-spacing: -0.04em;
   line-height: 1;
   white-space: nowrap;
-
-  color: rgba(0, 0, 0, 0.76);
+  color:var(--code-1);
 }
 
 /* 自动 / 前缀 */
@@ -806,7 +830,7 @@ body {
   top: 0.02em;
   transform: translateX(-0.08em);
 
-  color: rgba(0, 0, 0, 0.76);
+  color: var(--code-1)
 }
 
 /* 英文副标题 */
@@ -836,7 +860,7 @@ body {
 .stage4-item:hover .item-cn::before,
 .stage4-item:focus-visible .item-cn::before {
   color: transparent;
-  -webkit-text-stroke: clamp(2px, 0.25vw, 3px) #111;
+  -webkit-text-stroke: clamp(2px, 0.25vw, 3px) var(--code-1);
 }
 
 .stage4-item:hover,

@@ -1,0 +1,407 @@
+/* 页面背景 */
+.rh-page {
+  min-height: 100vh;
+  width: 100%;
+  background: var(--code-3);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* 整个电脑：上下左右居中（给右下角主页按钮留空间） */
+.rh-container {
+  min-height: 100vh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  padding: 28px 28px 120px;
+  box-sizing: border-box;
+}
+
+/* 电脑整体 */
+.rh-monitor {
+  width: min(1200px, 100%);
+}
+
+/* 外框（电脑壳） */
+.rh-bezel {
+  border-radius: 26px;
+  padding: 18px;
+  background: aliceblue;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+}
+
+/* 屏幕：16:9 不变 */
+.rh-screen {
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  position: relative;
+  max-height: 76vh;
+  aspect-ratio: 16 / 9;
+}
+
+/* 屏幕内：左右分栏（左图右文字） */
+.rh-screen-split {
+  height: 100%;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.35fr 0.9fr;
+}
+
+/* 左侧轮播区域：上主图 + 下 strip */
+.rh-screen-left {
+  position: relative;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.34);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 主图容器：固定 16:9 */
+.rh-mainshot {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.rh-screen-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.rh-empty {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.80);
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.rh-screen-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.40),
+    rgba(0, 0, 0, 0.00) 55%,
+    rgba(0, 0, 0, 0.16)
+  );
+  pointer-events: none;
+}
+
+/* ===== 底部 strip：无滚动条，靠 transform 翻页 ===== */
+
+/* 这个变量决定每次 translate 的步进：slot 宽 + gap
+   slot 宽我们用 “高度*16/9” 来保持 16:9 不变 */
+:root{
+  --rh-strip-gap: 10px;
+}
+
+/* 底部条：左右按钮 + 视窗 */
+.rh-strip {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  gap: 12px;
+  padding: 10px 12px 12px;
+  align-items: center;
+  overflow: hidden; /* 整块不出现滚动条 */
+}
+
+/* 左右按钮：更明显（加粗） */
+.rh-strip-nav{
+  width: 100%;
+  height: 100%; /* 你要竖条占满高度 OK */
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.20);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.rh-strip-nav:hover{
+  background: rgba(0, 0, 0, 0.26);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.rh-strip-nav:active{
+  transform: translateY(1px);
+}
+
+.rh-strip-nav[disabled]{
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* 视窗：裁切 track（关键：不会出现 scrollbar） */
+.rh-strip-viewport{
+  height: 100%;
+  min-height: 0;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.20);
+  backdrop-filter: blur(6px);
+  overflow: hidden; /* 这里决定：永远无滚动条 */
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+/* 轨道：一排横向排列，用 transform 翻页 */
+.rh-strip-track{
+  height: 100%;
+  display: flex;
+  gap: var(--rh-strip-gap);
+  align-items: stretch;
+  will-change: transform;
+  transition: transform 220ms ease;
+}
+
+/* 每个缩略图槽位：强制 16:9，不变形 */
+.rh-strip-slot{
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  flex: 0 0 auto;
+
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.rh-strip-slot:hover{
+  opacity: 1;
+}
+
+.rh-strip-slot:active{
+  transform: translateY(1px);
+}
+
+.rh-strip-slot.is-active{
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.60);
+}
+
+/* 占位块：你说的默认填充色 */
+.rh-slot-placeholder{
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.rh-thumb-img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 每次翻页的步进：slot 宽 + gap
+   slot 宽 = 视窗可用高度 * 16/9（因为 slot 高=100%） */
+.rh-strip-viewport{
+  --rh-thumb-step: calc((100% * (16 / 9)) + var(--rh-strip-gap));
+}
+
+/* 主图左右按钮（可选：你现在放在左侧底部，简单做） */
+
+
+/* 让箭头更明显（加粗） */
+.rh-chevron {
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 900;
+  transform: translateY(-1px);
+  color: aliceblue;
+}
+
+/* ===== 右侧文字区域 ===== */
+.rh-screen-right {
+  height: 100%;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.08);
+  border-left: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.rh-card {
+  border-radius: 22px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+}
+
+.rh-card-in-screen {
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.rh-card-hd {
+  margin-bottom: 14px;
+}
+
+.rh-label {
+  font-size: 12px;
+  opacity: 0.75;
+  letter-spacing: 0.02em;
+}
+
+.rh-project-name {
+  margin-top: 6px;
+  font-size: clamp(16px, 4.5vw, 24px);
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.rh-field {
+  margin-top: 16px;
+}
+
+.rh-text {
+  margin: 8px 0 0;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: clamp(12px, 3.5vw, 16px);
+}
+
+.rh-link {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.rh-link span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: clamp(10px, 3.5vw, 16px);
+}
+
+/* 右侧滚动条（保留你原来的美化） */
+.rh-card-in-screen {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+}
+.rh-card-in-screen::-webkit-scrollbar { width: 10px; }
+.rh-card-in-screen::-webkit-scrollbar-track { background: transparent; }
+.rh-card-in-screen::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+.rh-card-in-screen::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.34);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+/* ===== 底座（原样） ===== */
+.rh-stand {
+  display: grid;
+  place-items: center;
+  margin-top: 14px;
+}
+
+.rh-stand-neck {
+  width: 140px;
+  height: 22px;
+  border-radius: 999px;
+  background: aliceblue;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.rh-stand-base {
+  width: min(520px, 78%);
+  height: 18px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: aliceblue;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
+}
+
+/* 右下角主页按钮 */
+.rh-home {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.92);
+  cursor: pointer;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  z-index: 50;
+}
+
+/* ===== 设备适配：不改颜色，只改布局 ===== */
+
+/* 平板：上下布局（你原来就这样），并保持 strip 可用 */
+@media (max-width: 1000px) {
+  .rh-screen {
+    max-height: none;
+    aspect-ratio: auto;
+    height: min(86vh, 900px);
+  }
+
+  .rh-screen-split {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1.1fr 0.9fr;
+  }
+
+  .rh-screen-right {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+  }
+
+  .rh-strip{
+    grid-template-columns: 44px 1fr 44px;
+    gap: 10px;
+  }
+}
+
+/* 手机：按钮再宽一点方便点按，但仍无滚动条 */
+@media (max-width: 600px) {
+  .rh-container{
+    padding: 18px 16px 110px;
+  }
+
+  .rh-strip{
+    grid-template-columns: 48px 1fr 48px;
+  }
+}

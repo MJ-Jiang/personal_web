@@ -47,7 +47,7 @@ export default function Stage4({ stage, go }) {
             <span className="item-en">2026.01 · Web Full-stack</span>
           </button>
 
-          <button className="stage4-item" onClick={() => go('/projects/wechatycy')}>
+          <button className="stage4-item" onClick={() => go('/projects/answerbook')}>
             <span className="item-cn">答案之书</span>
             <span className="item-en">2025.07 · 微信小程序</span>
           </button>

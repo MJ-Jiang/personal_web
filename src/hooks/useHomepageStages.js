@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-export default function useHomepageStages() {
-  const [stage, setStage] = useState(1); // 1~4
+export default function useHomepageStages({ initialStage = 1 } = {}) {
+  const [stage, setStage] = useState(initialStage); // 1~4
   const [running, setRunning] = useState(false);
 
-  // ===== Stage-3 typing =====
   const CODE_TEXT = `while (alive) {
   keepEating();
   keepLearning();
@@ -48,6 +47,17 @@ export default function useHomepageStages() {
     clearStageTimers();
     clearTypingTimer();
 
+    // ✅ 如果外部指定直接进 stage4，就不要跑动画流程
+    if (initialStage === 4) {
+      setRunning(false);
+      setStage(4);
+      setTyped(CODE_TEXT); // 你也可以改成 ''，看你想不想显示完整代码
+      return () => {
+        clearStageTimers();
+        clearTypingTimer();
+      };
+    }
+
     const run = () => {
       setRunning(false);
       setStage(1);
@@ -65,7 +75,6 @@ export default function useHomepageStages() {
         () => setStage(3),
         T_INTRO + T_MERGE
       );
-      // stage-4 在 stage-3 打完字后触发
     };
 
     run();
@@ -74,7 +83,7 @@ export default function useHomepageStages() {
       clearTypingTimer();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prefersReduced]);
+  }, [prefersReduced, initialStage]);
 
   // 进入 stage-3 时开始打字；打完后再进入 stage-4
   useEffect(() => {
