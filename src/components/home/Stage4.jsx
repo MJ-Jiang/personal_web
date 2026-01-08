@@ -18,7 +18,7 @@ export default function Stage4({ stage, go }) {
 
         {/* 左侧信息 */}
         <section ref={leftRef} className="stage4-left">
-          <div className="stage4-left__name">June</div>
+          <div className="stage4-left__name">June Jiang</div>
 
           <div className="stage4-left__line">软件开发　软件测试</div>
 
@@ -57,6 +57,13 @@ export default function Stage4({ stage, go }) {
             <span className="item-en">Skills and Hobbies</span>
           </button>
         </section>
+       <footer className="stage4-footer">
+  <div className="stage4-footer__inner">
+    <div>凡算力所及，皆为牢笼；</div>
+    <div>凡算力不及，即为漏洞。</div>
+  </div>
+</footer>
+
       </div>
     </div>
   );

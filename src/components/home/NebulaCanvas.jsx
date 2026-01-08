@@ -35,8 +35,8 @@ export default function NebulaCanvas({ active, frameRef, leftRef }) {
       const lr = leftEl.getBoundingClientRect();
 
       // ✅ 出生点：邮箱区域右下角附近（left block 的 right/bottom）
-      const startX = (lr.right - fr.left) + Math.min(80, fr.width * 0.06);
-      const startY = (lr.bottom - fr.top) + Math.min(40, fr.height * 0.04);
+      const startX = lr.right - fr.left + Math.min(80, fr.width * 0.06);
+      const startY = lr.bottom - fr.top + Math.min(40, fr.height * 0.04);
 
       // ✅ 终点：框内右下角（固定 inset，保证贴角且不被裁）
       const inset = 28; // 越小越贴角（18~40）
@@ -96,16 +96,14 @@ export default function NebulaCanvas({ active, frameRef, leftRef }) {
 
     for (let i = 0; i < COUNT; i++) particles.push(spawn());
 
-
     let t = 0;
     const loopSecs = 14.0;
 
     const BASE_VORTEX = 0.2;
-    const BASE_SPREAD = 0.55;
-    const FLOW = 0.5;
+    const BASE_SPREAD = 0.35;
+    const FLOW = 0.3;
 
     const step = () => {
-
       t += 1 / 135;
 
       const phase = (t % loopSecs) / loopSecs; // 0~1
@@ -132,12 +130,12 @@ export default function NebulaCanvas({ active, frameRef, leftRef }) {
       const centerY = cy + (endY - cy) * (lock * lock);
 
       // ✅ 末段强吸附：确保“密度峰值/发散落点”贴右下角
-      const snapK = 0.030 * lock * lock; // 可调 0.02~0.06（越大越“吸住”右下）
+      const snapK = 0.008 * lock * lock; // 可调 0.02~0.06（越大越“吸住”右下）
 
       for (let i = 0; i < particles.length; i++) {
         const pt = particles[i];
 
-        // 👇 注意：这里用 centerX/centerY（末段会变成右下角）
+        // 这里用 centerX/centerY（末段会变成右下角）
         const dx = pt.x - centerX;
         const dy = pt.y - centerY;
         const dist = Math.max(22, Math.hypot(dx, dy));
@@ -151,19 +149,18 @@ export default function NebulaCanvas({ active, frameRef, leftRef }) {
         const n1 = Math.sin((t * 1.4 + pt.seed) * 0.9) * 0.05;
         const n2 = Math.cos((t * 1.1 + pt.seed) * 0.7) * 0.05;
 
-   
-        const push = 0.012 + 0.03 * p;
+        const push = 0.008 + 0.01 * p;
 
         // 基础力场：旋转 + 扩散 + 向右下推进
         pt.vx +=
-          tx * (vortexStrength * 0.36) +
-          rx * (spreadStrength * 0.20) +
+          tx * (vortexStrength * 0.24) +
+          rx * (spreadStrength * 0.1) +
           flowX * push +
           n1;
 
         pt.vy +=
-          ty * (vortexStrength * 0.36) +
-          ry * (spreadStrength * 0.20) +
+          ty * (vortexStrength * 0.24) +
+          ry * (spreadStrength * 0.1) +
           flowY * push +
           n2;
 
@@ -171,9 +168,8 @@ export default function NebulaCanvas({ active, frameRef, leftRef }) {
         pt.vx += (endX - pt.x) * snapK;
         pt.vy += (endY - pt.y) * snapK;
 
-
-        pt.vx *= 0.986;
-        pt.vy *= 0.986;
+        pt.vx *= 0.992;
+        pt.vy *= 0.992;
 
         pt.x += pt.vx * pt.drift;
         pt.y += pt.vy * pt.drift;
@@ -208,5 +204,7 @@ export default function NebulaCanvas({ active, frameRef, leftRef }) {
     };
   }, [active, frameRef, leftRef]);
 
-  return <canvas ref={canvasRef} className="stage4-nebula" aria-hidden="true" />;
+  return (
+    <canvas ref={canvasRef} className="stage4-nebula" aria-hidden="true" />
+  );
 }

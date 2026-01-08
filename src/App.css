@@ -54,16 +54,13 @@ body {
 }
 
 /* stage-4：只要底色 + 空屏 */
+
 .app.stage-4 {
-  background:
-    radial-gradient(1200px 700px at 50% 0%, var(--code-2), transparent 70%),
-    linear-gradient(180deg, var(--code-3), rgba(255, 255, 255, 0.92));
+  background: var(--code-1);
   color: #141414;
 }
-.stage4-empty {
-  position: absolute;
-  inset: 0;
-}
+
+
 
 /* 分屏 */
 .split {
@@ -591,12 +588,14 @@ body {
 /* ============ stage4（桌面端自适应） ============ */
 /* stage4 外层不变：入场动画 */
 .stage4 {
-  position: fixed;  
+  position: fixed;
   inset: 0;
   pointer-events: none;
   opacity: 0;
   transform: scale(1.02);
-  transition: opacity 520ms var(--ease-out), transform 520ms var(--ease-out);
+  transition:
+    opacity 520ms var(--ease-out),
+    transform 520ms var(--ease-out);
   overflow: visible;
 }
 
@@ -607,21 +606,54 @@ body {
 }
 
 /* 只保留一个四边框：离屏幕四周留一点距离 */
+
 .stage4-frame.stage4-frame--boxed {
   position: relative;
-  background: linear-gradient(90deg, var(--code-1), var(--code-2), var(--code-3));
-  margin: clamp(10px, 1.6vw, 18px);
-  border: 1px solid rgba(0,0,0,0.55);
-  box-sizing: border-box;
-
-  height: calc(100vh - 2 * clamp(10px, 1.6vw, 18px)); 
+  background: transparent;
+  border: none;
+  margin: 0;
+  height: 100vh;
   overflow: hidden;
 
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
   gap: clamp(18px, 3vw, 42px);
   padding: clamp(22px, 3.2vw, 46px);
+
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr 1.2fr;
+  grid-template-areas:
+    'left  right'
+    'left  right'
+    'footer right';
 }
+
+.stage4-left {
+  grid-area: left;
+}
+.stage4-right {
+  grid-area: right;
+}
+.stage4-footer {
+  grid-area: footer;
+}
+.stage4-footer{
+  justify-self: start;
+  align-self: end;
+}
+
+.stage4-footer__inner{
+  display: inline-block;
+  transform-origin: left bottom;
+  transform: perspective(600px) rotateX(22deg);
+  /* 嵌入感：凹印 */
+  color: rgba(255,253,245,0.55);
+  text-shadow:
+    0 1px 0 rgba(0,0,0,0.24),
+    0 -1px 0 rgba(255,255,255,0.14);
+  letter-spacing: 0.08em;
+  line-height: 1.7;
+}
+
 
 .stage4-nebula {
   position: absolute;
@@ -667,14 +699,29 @@ body {
   align-self: start;
   justify-self: start;
   max-width: 520px;
+  background: #2b2b26;
+
+  padding: clamp(18px, 3vw, 32px)
+           clamp(22px, 3.6vw, 42px);
+  border-radius: 6px;
+
+  /* 让内容不要贴边 */
+  box-sizing: border-box;
+   color: var(--code-1);
 }
 
 .stage4-left__name {
-
-   font-size: clamp(30px, 5.2vw, 80px);
+  font-size: clamp(28px, 5vw, 80px);
   font-weight: 900;
   letter-spacing: 0.02em;
-  color: rgba(0,0,0,0.82);
+  font-family:
+    Avenir,
+    'Avenir Next',
+    'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
+  font-weight: 900;
   line-height: 1;
   margin-bottom: clamp(6px, 1.2h, 10px);
 }
@@ -682,26 +729,35 @@ body {
   margin-top: -2px;
 }
 .stage4-left__line {
-font-size: clamp(12px, 1.2vw, 15px);
-
+  font-size: clamp(10px, 1vw, 13px);
   line-height: 1.9;
-  color: rgba(0,0,0,0.78);
   margin-top: 6px;
+  font-weight: 600;
+  display: flex;
 }
 
 .stage4-left__link {
-  color: rgba(0,0,0,0.78);
   text-decoration: none;
-  border-bottom: 1px solid rgba(0,0,0,0.18);
   font-size: clamp(10px, 1vw, 13px);
   overflow: hidden;
-
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
+.stage4-left__link,
+.stage4-left__link:visited,
+.stage4-left__link:hover,
+.stage4-left__link:active {
+  color: var(--code-1);
+}
+.stage4-left__link {
+  display: inline-block; /* ✅ 关键 1 */
+  transition: transform 180ms ease; /* ✅ 关键 2 */
+}
 .stage4-left__link:hover {
-  border-bottom-color: rgba(0,0,0,0.45);
+  transform: translateY(-2px);
 }
-
 /* 右侧：三组项目导航 */
 .stage4-right {
   justify-self: end;
@@ -728,41 +784,59 @@ font-size: clamp(12px, 1.2vw, 15px);
   transition: transform 200ms ease;
 }
 
-/* 中文主标题（黑色实心） */
+/* 中文主标题 */
 .stage4-item .item-cn {
-   font-size: clamp(30px, 5.2vw, 80px);
+  position: relative;
+  padding-left: 0.7em; /* 给 / 留位置 */
+
+  font-size: clamp(30px, 5.2vw, 80px);
   font-weight: 900;
   letter-spacing: -0.04em;
   line-height: 1;
   white-space: nowrap;
 
-  color: #111;
-  -webkit-text-stroke: 0 transparent;
+  color: rgba(0, 0, 0, 0.76);
 }
 
-/* 英文/副标题（像你图里 PROJECTS：更轻、更小） */
+/* 自动 / 前缀 */
+.stage4-item .item-cn::before {
+  content: '/';
+  position: absolute;
+  left: 0;
+  top: 0.02em;
+  transform: translateX(-0.08em);
+
+  color: rgba(0, 0, 0, 0.76);
+}
+
+/* 英文副标题 */
 .stage4-item .item-en {
   font-size: 0.8em;
-  margin-top: -0.16em; /* ✅ 有一点点重合 */
+  margin-top: -0.16em;
   letter-spacing: 0.14em;
   font-weight: 700;
   text-transform: uppercase;
-
-  color: rgba(0,0,0,0.36);
   white-space: nowrap;
+
+  color: rgba(0, 0, 0, 0.36);
+}
+.item-en {
+  font-family:
+    Avenir,
+    'Avenir Next',
+    'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
-/* hover：中空效果（主+副一起中空） */
+/* hover / focus：中空效果（主标题 + / 一起） */
 .stage4-item:hover .item-cn,
-.stage4-item:focus-visible .item-cn {
+.stage4-item:focus-visible .item-cn,
+.stage4-item:hover .item-cn::before,
+.stage4-item:focus-visible .item-cn::before {
   color: transparent;
   -webkit-text-stroke: clamp(2px, 0.25vw, 3px) #111;
-}
-
-.stage4-item:hover .item-en,
-.stage4-item:focus-visible .item-en {
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(0,0,0,0.36);
 }
 
 .stage4-item:hover,
@@ -770,47 +844,8 @@ font-size: clamp(12px, 1.2vw, 15px);
   outline: none;
   transform: skewY(-8deg) translateX(6px);
 }
-/* 给每个右侧条目自动加 / 前缀 */
-.stage4-item .item-cn {
-  position: relative;
-  padding-left: 0.7em; /* 给 / 留位置 */
-}
-
-.stage4-item .item-cn::before {
-  content: "/";
-  position: absolute;
-  left: 0;
-  top: 0.02em;
-  color: #111;
-  transform: translateX(-0.08em);
-}
-
-/* hover 变中空时，/ 也一起中空 */
-.stage4-item:hover .item-cn::before,
-.stage4-item:focus-visible .item-cn::before {
-  color: transparent;
-  -webkit-text-stroke: clamp(2px, 0.25vw, 3px) #111;
-}
-
 
 /* 桌面端窗口高度较矮时：收紧间距，避免拥挤（仍属桌面端） */
-@media (max-height: 720px) {
-  .stage4-frame.stage4-frame--boxed {
-    padding: clamp(16px, 2.6vw, 34px);
-  }
-  .stage4-right {
-    gap: clamp(14px, 3vh, 28px);
-  }
-  .stage4-left__name {
-    margin-bottom: clamp(12px, 2vh, 18px);
-  }
-}
-
-
-
-
-
-
 
 /* 阶段控制 */
 .app.stage-1 .panel--left {
@@ -918,17 +953,21 @@ font-size: clamp(12px, 1.2vw, 15px);
   --r: -1deg;
 }
 
-
-
 /* 手机端 */
+/* ===============================
+   Mobile (<= 720px)
+================================ */
 @media (max-width: 720px) {
+  /* ---- stage 1 panels ---- */
   .panel {
     width: 100%;
     height: 50%;
   }
+
   .panel--right {
     inset: auto 0 0 0;
   }
+
   .seam {
     left: 0;
     top: 50%;
@@ -936,6 +975,11 @@ font-size: clamp(12px, 1.2vw, 15px);
     height: 1px;
     transform: translateY(-0.5px);
   }
+
+  .app {
+    --m-seam-offset: 18px;
+  }
+
   .app.stage-1 .panel--left {
     transform: translateY(-6%);
   }
@@ -946,25 +990,12 @@ font-size: clamp(12px, 1.2vw, 15px);
   .app.stage-1.is-running .panel--right {
     transform: translateY(0);
   }
+
   .app.stage-2 .panel--left {
     transform: translateY(2.5%);
   }
   .app.stage-2 .panel--right {
     transform: translateY(-2.5%);
-  }
-  .panel--left .panel__label--right {
-    right: 14px;
-    left: 14px;
-    text-align: right;
-    align-items: flex-end;
-  }
-  .panel--left .panel__label--right .title {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .app {
-    --m-seam-offset: 18px;
   }
 
   .panel--left .panel__label {
@@ -977,6 +1008,20 @@ font-size: clamp(12px, 1.2vw, 15px);
     left: 14px;
     right: auto;
   }
+
+  .panel--left .panel__label--right {
+    right: 14px;
+    left: 14px;
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .panel--left .panel__label--right .title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .shot.s1 {
     top: 22%;
   }
@@ -986,4 +1031,31 @@ font-size: clamp(12px, 1.2vw, 15px);
   .shot.s3 {
     top: 64%;
   }
+
+  /* ---- stage 4 layout ---- */
+  .stage4-frame.stage4-frame--boxed {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+      'left'
+      '.'
+      'right'
+      '.'
+    
+      'footer';
+    row-gap: clamp(36px, 10vh, 88px);
+  }
+
+  .stage4-left {
+    justify-self: start;
+    align-self: start;
+    max-width: 100%;
+  }
+
+  .stage4-right {
+    justify-self: end;
+    align-self: start;
+  }
 }
+
+
