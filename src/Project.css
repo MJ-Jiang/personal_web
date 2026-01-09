@@ -36,7 +36,7 @@
   border-radius: 14px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
   max-height: 76vh;
   aspect-ratio: 16 / 9;
@@ -58,11 +58,11 @@
   display: flex;
   flex-direction: column;
 } */
-.rh-screen-left{
+.rh-screen-left {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: hidden;  /* 防止内部把布局顶爆 */
+  overflow: hidden; /* 防止内部把布局顶爆 */
 }
 /* 主图容器 */
 /* .rh-mainshot {
@@ -72,7 +72,7 @@
   overflow: hidden;
   flex: 0 0 auto;
 } */
- .rh-mainshot{
+.rh-mainshot {
   flex: 0 0 auto;
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -92,7 +92,7 @@
   height: 100%;
   display: grid;
   place-items: center;
-  color: rgba(255, 255, 255, 0.80);
+  color: rgba(255, 255, 255, 0.8);
   background: rgba(0, 0, 0, 0.55);
 }
 
@@ -101,8 +101,8 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.40),
-    rgba(0, 0, 0, 0.00) 55%,
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0) 55%,
     rgba(0, 0, 0, 0.16)
   );
   pointer-events: none;
@@ -128,36 +128,39 @@
 }
 
 /* 左右按钮 */
-.rh-strip-nav{
+.rh-strip-nav {
   width: 100%;
   height: 100%;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(0, 0, 0, 0.20);
+  background: rgba(0, 0, 0, 0.2);
   cursor: pointer;
   display: grid;
   place-items: center;
-  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+  transition:
+    transform 160ms ease,
+    background 160ms ease,
+    border-color 160ms ease;
 }
-.rh-strip-nav:hover{
+.rh-strip-nav:hover {
   background: rgba(0, 0, 0, 0.26);
   border-color: rgba(255, 255, 255, 0.22);
 }
-.rh-strip-nav:active{
+.rh-strip-nav:active {
   transform: translateY(1px);
 }
-.rh-strip-nav[disabled]{
+.rh-strip-nav[disabled] {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
 /* 视窗：裁切 track（永不出现滚动条） */
-.rh-strip-viewport{
+.rh-strip-viewport {
   height: 100%;
   min-height: 0;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(0, 0, 0, 0.20);
+  background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(6px);
   overflow: hidden;
   padding: 6px;
@@ -165,7 +168,7 @@
 }
 
 /* 轨道：靠 transform 移动（由 JS 像素控制） */
-.rh-strip-track{
+.rh-strip-track {
   height: 100%;
   display: flex;
   gap: var(--rh-strip-gap);
@@ -175,7 +178,7 @@
 }
 
 /* 每个缩略图槽位：强制 16:9 */
-.rh-strip-slot{
+.rh-strip-slot {
   height: 100%;
   aspect-ratio: 16 / 9;
   flex: 0 0 auto;
@@ -187,24 +190,31 @@
   padding: 0;
   cursor: pointer;
   opacity: 0.85;
-  transition: opacity 160ms ease, border-color 160ms ease, transform 160ms ease;
+  transition:
+    opacity 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
 }
-.rh-strip-slot:hover{ opacity: 1; }
-.rh-strip-slot:active{ transform: translateY(1px); }
-.rh-strip-slot.is-active{
+.rh-strip-slot:hover {
   opacity: 1;
-  border-color: rgba(255, 255, 255, 0.60);
+}
+.rh-strip-slot:active {
+  transform: translateY(1px);
+}
+.rh-strip-slot.is-active {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 /* 占位块 */
-.rh-slot-placeholder{
+.rh-slot-placeholder {
   display: block;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.rh-thumb-img{
+.rh-thumb-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -226,7 +236,7 @@
   height: 100%;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.08);
-  border-left: 1px solid rgba(255, 255, 255, 0.10);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .rh-card {
@@ -249,8 +259,12 @@
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
 }
-.rh-card-in-screen::-webkit-scrollbar { width: 10px; }
-.rh-card-in-screen::-webkit-scrollbar-track { background: transparent; }
+.rh-card-in-screen::-webkit-scrollbar {
+  width: 10px;
+}
+.rh-card-in-screen::-webkit-scrollbar-track {
+  background: transparent;
+}
 .rh-card-in-screen::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.22);
   border-radius: 999px;
@@ -261,7 +275,9 @@
   background: rgba(255, 255, 255, 0.34);
 }
 
-.rh-card-hd { margin-bottom: 14px; }
+.rh-card-hd {
+  margin-bottom: 14px;
+}
 
 .rh-label {
   font-size: 12px;
@@ -276,7 +292,9 @@
   line-height: 1.2;
 }
 
-.rh-field { margin-top: 16px; }
+.rh-field {
+  margin-top: 16px;
+}
 
 .rh-text {
   margin: 8px 0 0;
@@ -365,26 +383,81 @@
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
   z-index: 50;
 }
+/* ===== 图片放大层（覆盖在所有内容之上） ===== */
+.rh-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.72);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+/* 新增：作为图片与按钮的“定位容器” */
+.rh-zoom-frame {
+  position: relative;
+  display: inline-block;
+  max-width: min(1100px, 96vw);
+  max-height: 92vh;
+}
+
+/* 图片保持不变 */
+.rh-zoom-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* 关闭按钮：跟着图片右上角走 */
+.rh-zoom-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.92);
+
+  display: grid;
+  place-items: center;
+  padding: 0;
+  margin: 0;
+
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
 
 /* ===== 设备适配 ===== */
-
 
 /* 平板 + 手机：整台 monitor 一屏；右侧占剩余高度；右侧内部滚动 */
 /* ===== 适配：平板 + 手机（统一高度链路） ===== */
 @media (max-width: 1000px) {
   /* 统一用变量控制容器留白，monitor 高度跟着变 */
-  :root{
+  :root {
     --rh-pad-y: 16px;
     --rh-pad-x: 16px;
   }
 
-  .rh-container{
+  .rh-container {
     padding: var(--rh-pad-y) var(--rh-pad-x) !important;
     min-height: 100vh;
   }
 
   /* 整台电脑（含底座）= 一屏高度（用 dvh 更稳） */
-  .rh-monitor{
+  .rh-monitor {
     height: calc(100dvh - (var(--rh-pad-y) * 2)) !important;
     max-height: calc(100dvh - (var(--rh-pad-y) * 2)) !important;
     display: flex;
@@ -392,48 +465,48 @@
     min-height: 0;
   }
 
-  .rh-bezel{
+  .rh-bezel {
     flex: 1 1 auto;
     min-height: 0;
   }
 
-  .rh-stand{
+  .rh-stand {
     flex: 0 0 auto; /* 底座保留 */
   }
 
-  .rh-screen{
+  .rh-screen {
     height: 100% !important;
     max-height: none !important;
     aspect-ratio: auto;
   }
 
   /* 上下布局：left 固定，right 吃剩余高度 */
-  .rh-screen-split{
+  .rh-screen-split {
     grid-template-columns: 1fr;
     grid-template-rows: auto minmax(0, 1fr);
     height: 100%;
   }
 
-  .rh-screen-left{
+  .rh-screen-left {
     overflow: hidden;
     min-height: 0;
   }
 
-  .rh-screen-right{
+  .rh-screen-right {
     min-height: 0;
     overflow: hidden; /* 不让内容撑开，把滚动交给内部卡片 */
     border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.10);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   /* 内容少不出滚动条，内容多才滚 */
-  .rh-card-in-screen{
+  .rh-card-in-screen {
     height: 100%;
     overflow-y: auto;
   }
 
   /* 缩略图条：平板高度 */
-  .rh-strip{
+  .rh-strip {
     flex: 0 0 auto;
     height: clamp(90px, 14vh, 150px);
     min-height: 0;
@@ -443,19 +516,19 @@
 /* ===== 适配：手机（更大上下留白 + 更薄白壳 + 更窄箭头） ===== */
 @media (max-width: 600px) {
   /* 只改变量即可：padding 变大，monitor 自动变矮，不会出现页面滚动条 */
-  :root{
+  :root {
     --rh-pad-y: 32px;
     --rh-pad-x: 12px;
   }
 
   /* 白色机壳变薄 */
-  .rh-bezel{
+  .rh-bezel {
     padding: 10px !important;
     border-radius: 14px !important;
   }
 
   /* 缩略图条更矮 + 两侧按钮更窄 */
-  .rh-strip{
+  .rh-strip {
     min-height: 0 !important;
     grid-template-columns: 24px 1fr 24px !important;
     gap: 6px !important;
@@ -463,7 +536,7 @@
     height: clamp(32px, 10vh, 92px) !important;
   }
 
-  .rh-strip-nav{
+  .rh-strip-nav {
     padding: 0 !important;
     margin: 0 !important;
     width: 24px !important;
@@ -473,20 +546,37 @@
     border-radius: 10px;
   }
 
-  .rh-chevron{
+  .rh-chevron {
     font-size: 16px !important;
     font-weight: 800;
     transform: translateY(-0.5px);
   }
 
-  .rh-strip-viewport{
+  .rh-strip-viewport {
     padding: 4px !important;
     border-radius: 14px;
     height: 100%;
   }
 
   .rh-strip-track,
-  .rh-strip-slot{
+  .rh-strip-slot {
     height: 100%;
+  }
+  .rh-zoom {
+    padding: 12px;
+  }
+  .rh-zoom-frame {
+    max-width: 96vw;
+    max-height: 88vh;
+  }
+  .rh-zoom-img {
+    max-height: 88vh;
+  }
+  .rh-zoom-close {
+    width: 34px;
+    height: 34px;
+    font-size: 22px;
+    top: 8px;
+    right: 8px;
   }
 }

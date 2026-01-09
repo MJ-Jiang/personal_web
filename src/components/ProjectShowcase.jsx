@@ -1,8 +1,8 @@
 // src/components/ProjectShowcase.jsx
-import React, { useEffect, useRef, useState } from "react";
-import { Home, ExternalLink, Code2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import "../Project.css";
+import React, { useEffect, useRef, useState } from 'react';
+import { Home, ExternalLink, Code2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import '../Project.css';
 
 export default function ProjectShowcase({ project }) {
   const navigate = useNavigate();
@@ -23,9 +23,12 @@ export default function ProjectShowcase({ project }) {
 
   const [translateX, setTranslateX] = useState(0);
 
-  const currentImage = images[imageIndex] ?? "";
+  const currentImage = images[imageIndex] ?? '';
   const hasPrev = imageIndex > 0;
   const hasNext = imageIndex < realCount - 1;
+
+  // ✅ 放大预览
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
 
   function prevImage() {
     setImageIndex((i) => Math.max(0, i - 1));
@@ -36,29 +39,42 @@ export default function ProjectShowcase({ project }) {
   function onThumbClick(idx) {
     if (idx >= 0 && idx < realCount) setImageIndex(idx);
   }
-function isHttpUrl(v) {
-  if (!v) return false;
-  const s = String(v).trim();
-  return /^https?:\/\/\S+$/i.test(s);
-}
 
-  const goHome = () => navigate("/", { state: { startStage: 4 } });
+  function isHttpUrl(v) {
+    if (!v) return false;
+    const s = String(v).trim();
+    return /^https?:\/\/\S+$/i.test(s);
+  }
+
+  const goHome = () => navigate('/', { state: { startStage: 4 } });
 
   const slots = Array.from({ length: totalSlots }, (_, i) => images[i] ?? null);
 
+  // 换项目时：回到第 1 张 + 重置位移 + 关闭放大层
   useEffect(() => {
-    // 换项目时，回到第 1 张 + 重置位移
     setImageIndex(0);
     setTranslateX(0);
+    setIsZoomOpen(false);
   }, [project?.id]);
 
+  // ESC 关闭放大层
+  useEffect(() => {
+    if (!isZoomOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setIsZoomOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isZoomOpen]);
+
+  // 计算 stepPx / maxTranslatePx（尺寸变化就重算）
   useEffect(() => {
     const viewportEl = viewportRef.current;
     const trackEl = trackRef.current;
     if (!viewportEl || !trackEl) return;
 
     const computeMetrics = () => {
-      const firstSlot = trackEl.querySelector(".rh-strip-slot");
+      const firstSlot = trackEl.querySelector('.rh-strip-slot');
       if (!firstSlot) {
         stepPxRef.current = 0;
         maxTranslatePxRef.current = 0;
@@ -68,7 +84,7 @@ function isHttpUrl(v) {
 
       const slotW = firstSlot.getBoundingClientRect().width;
       const styles = window.getComputedStyle(trackEl);
-      const gapStr = styles.gap || styles.columnGap || "0px";
+      const gapStr = styles.gap || styles.columnGap || '0px';
       const gapPx = parseFloat(gapStr) || 0;
       const stepPx = slotW + gapPx;
 
@@ -89,13 +105,14 @@ function isHttpUrl(v) {
     ro.observe(viewportEl);
     ro.observe(trackEl);
 
-    window.addEventListener("resize", computeMetrics);
+    window.addEventListener('resize', computeMetrics);
     return () => {
       ro.disconnect();
-      window.removeEventListener("resize", computeMetrics);
+      window.removeEventListener('resize', computeMetrics);
     };
   }, [imageIndex, totalSlots, realCount]);
 
+  // 选中 index 变化：推进 translateX，直到末尾贴右
   useEffect(() => {
     const step = stepPxRef.current;
     const maxX = maxTranslatePxRef.current;
@@ -123,8 +140,16 @@ function isHttpUrl(v) {
                       <img
                         className="rh-screen-img"
                         src={currentImage}
-                        alt={project?.name || "project image"}
+                        alt={project?.name || 'project image'}
                         draggable={false}
+                        // ✅ 点击主图放大
+                        onClick={() => setIsZoomOpen(true)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ')
+                            setIsZoomOpen(true);
+                        }}
                       />
                     ) : (
                       <div className="rh-empty">暂无图片</div>
@@ -142,11 +167,15 @@ function isHttpUrl(v) {
                       title="上一张"
                     >
                       <span className="rh-chevron" aria-hidden="true">
-                        {"<"}
+                        {'<'}
                       </span>
                     </button>
 
-                    <div className="rh-strip-viewport" ref={viewportRef} aria-label="缩略图视窗">
+                    <div
+                      className="rh-strip-viewport"
+                      ref={viewportRef}
+                      aria-label="缩略图视窗"
+                    >
                       <div
                         className="rh-strip-track"
                         ref={trackRef}
@@ -158,20 +187,30 @@ function isHttpUrl(v) {
 
                           return (
                             <button
-                              key={`${idx}-${src ?? "empty"}`}
+                              key={`${idx}-${src ?? 'empty'}`}
                               type="button"
-                              className={`rh-strip-slot ${isActive ? "is-active" : ""} ${
-                                isReal ? "" : "is-empty"
+                              className={`rh-strip-slot ${isActive ? 'is-active' : ''} ${
+                                isReal ? '' : 'is-empty'
                               }`}
                               onClick={() => onThumbClick(idx)}
                               disabled={!isReal}
-                              aria-label={isReal ? `切换到第 ${idx + 1} 张` : "占位"}
-                              title={isReal ? `第 ${idx + 1} 张` : "占位"}
+                              aria-label={
+                                isReal ? `切换到第 ${idx + 1} 张` : '占位'
+                              }
+                              title={isReal ? `第 ${idx + 1} 张` : '占位'}
                             >
                               {isReal ? (
-                                <img className="rh-thumb-img" src={src} alt="" draggable={false} />
+                                <img
+                                  className="rh-thumb-img"
+                                  src={src}
+                                  alt=""
+                                  draggable={false}
+                                />
                               ) : (
-                                <span className="rh-slot-placeholder" aria-hidden="true" />
+                                <span
+                                  className="rh-slot-placeholder"
+                                  aria-hidden="true"
+                                />
                               )}
                             </button>
                           );
@@ -188,7 +227,7 @@ function isHttpUrl(v) {
                       title="下一张"
                     >
                       <span className="rh-chevron" aria-hidden="true">
-                        {">"}
+                        {'>'}
                       </span>
                     </button>
                   </div>
@@ -202,28 +241,56 @@ function isHttpUrl(v) {
                       <div className="rh-project-name">{project?.name}</div>
                     </div>
 
+                    {/* 网页链接：URL 才可点击；否则显示说明文字 */}
                     <div className="rh-field">
-  <div className="rh-label">网页链接</div>
+                      <div className="rh-label">网页链接</div>
 
-  {isHttpUrl(project?.websiteUrl) ? (
-    <a className="rh-link" href={project.websiteUrl} target="_blank" rel="noreferrer">
-      <ExternalLink size={16} />
-      <span>{project.websiteUrl}</span>
-    </a>
-  ) : (
-    <div className="rh-link is-text" role="note" aria-label="网页链接说明">
-      <ExternalLink size={16} />
-      <span>{project?.websiteUrl || "暂无"}</span>
-    </div>
-  )}
-</div>
+                      {isHttpUrl(project?.websiteUrl) ? (
+                        <a
+                          className="rh-link"
+                          href={project.websiteUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <ExternalLink size={16} />
+                          <span>{project.websiteUrl}</span>
+                        </a>
+                      ) : (
+                        <div
+                          className="rh-link is-text"
+                          role="note"
+                          aria-label="网页链接说明"
+                        >
+                          <ExternalLink size={16} />
+                          <span>{project?.websiteUrl || '暂无'}</span>
+                        </div>
+                      )}
+                    </div>
 
+                    {/* 代码链接：同样做成智能可点/不可点（更一致） */}
                     <div className="rh-field">
                       <div className="rh-label">代码链接</div>
-                      <a className="rh-link" href={project?.codeUrl} target="_blank" rel="noreferrer">
-                        <Code2 size={16} />
-                        <span>{project?.codeUrl}</span>
-                      </a>
+
+                      {isHttpUrl(project?.codeUrl) ? (
+                        <a
+                          className="rh-link"
+                          href={project.codeUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <Code2 size={16} />
+                          <span>{project.codeUrl}</span>
+                        </a>
+                      ) : (
+                        <div
+                          className="rh-link is-text"
+                          role="note"
+                          aria-label="代码链接说明"
+                        >
+                          <Code2 size={16} />
+                          <span>{project?.codeUrl || '暂无'}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="rh-field">
@@ -244,11 +311,44 @@ function isHttpUrl(v) {
         </div>
 
         {/* 右下角主页按钮 */}
-        <button className="rh-home" onClick={goHome} type="button" aria-label="回到主页">
+        <button
+          className="rh-home"
+          onClick={goHome}
+          type="button"
+          aria-label="回到主页"
+        >
           <Home size={18} />
           <span>主页</span>
         </button>
       </div>
+
+      {isZoomOpen && (
+        <div
+          className="rh-zoom"
+          role="dialog"
+          aria-modal="true"
+          aria-label="图片放大预览"
+          onClick={() => setIsZoomOpen(false)}
+        >
+          <div className="rh-zoom-frame" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="rh-zoom-close"
+              onClick={() => setIsZoomOpen(false)}
+              aria-label="关闭"
+            >
+              ×
+            </button>
+
+            <img
+              className="rh-zoom-img"
+              src={currentImage}
+              alt={project?.name || 'zoom image'}
+              draggable={false}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
