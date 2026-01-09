@@ -30,7 +30,7 @@
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
 }
 
-/* 屏幕：16:9 不变 */
+/* 屏幕 */
 .rh-screen {
   width: 100%;
   border-radius: 18px;
@@ -42,7 +42,7 @@
   aspect-ratio: 16 / 9;
 }
 
-/* 屏幕内：左右分栏（左图右文字） */
+/* 左右分栏 */
 .rh-screen-split {
   height: 100%;
   width: 100%;
@@ -50,7 +50,7 @@
   grid-template-columns: 1.35fr 0.9fr;
 }
 
-/* 左侧轮播区域：上主图 + 下 strip */
+/* 左侧：上主图+下条 */
 .rh-screen-left {
   position: relative;
   overflow: hidden;
@@ -59,7 +59,7 @@
   flex-direction: column;
 }
 
-/* 主图容器：固定 16:9 */
+/* 主图容器 */
 .rh-mainshot {
   position: relative;
   width: 100%;
@@ -97,11 +97,8 @@
   pointer-events: none;
 }
 
-/* ===== 底部 strip：无滚动条，靠 transform 翻页 ===== */
-
-/* 这个变量决定每次 translate 的步进：slot 宽 + gap
-   slot 宽我们用 “高度*16/9” 来保持 16:9 不变 */
-:root{
+/* ===== 底部 strip ===== */
+:root {
   --rh-strip-gap: 10px;
 }
 
@@ -114,13 +111,14 @@
   gap: 12px;
   padding: 10px 12px 12px;
   align-items: center;
-  overflow: hidden; /* 整块不出现滚动条 */
+  overflow: hidden;
+  height: clamp(90px, 18vh, 160px);
 }
 
-/* 左右按钮：更明显（加粗） */
+/* 左右按钮 */
 .rh-strip-nav{
   width: 100%;
-  height: 100%; /* 你要竖条占满高度 OK */
+  height: 100%;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(0, 0, 0, 0.20);
@@ -129,35 +127,32 @@
   place-items: center;
   transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
 }
-
 .rh-strip-nav:hover{
   background: rgba(0, 0, 0, 0.26);
   border-color: rgba(255, 255, 255, 0.22);
 }
-
 .rh-strip-nav:active{
   transform: translateY(1px);
 }
-
 .rh-strip-nav[disabled]{
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-/* 视窗：裁切 track（关键：不会出现 scrollbar） */
+/* 视窗：裁切 track（永不出现滚动条） */
 .rh-strip-viewport{
   height: 100%;
   min-height: 0;
-  border-radius: 18px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(0, 0, 0, 0.20);
   backdrop-filter: blur(6px);
-  overflow: hidden; /* 这里决定：永远无滚动条 */
+  overflow: hidden;
   padding: 6px;
   box-sizing: border-box;
 }
 
-/* 轨道：一排横向排列，用 transform 翻页 */
+/* 轨道：靠 transform 移动（由 JS 像素控制） */
 .rh-strip-track{
   height: 100%;
   display: flex;
@@ -167,13 +162,13 @@
   transition: transform 220ms ease;
 }
 
-/* 每个缩略图槽位：强制 16:9，不变形 */
+/* 每个缩略图槽位：强制 16:9 */
 .rh-strip-slot{
   height: 100%;
   aspect-ratio: 16 / 9;
   flex: 0 0 auto;
 
-  border-radius: 14px;
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: transparent;
@@ -182,21 +177,14 @@
   opacity: 0.85;
   transition: opacity 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
-
-.rh-strip-slot:hover{
-  opacity: 1;
-}
-
-.rh-strip-slot:active{
-  transform: translateY(1px);
-}
-
+.rh-strip-slot:hover{ opacity: 1; }
+.rh-strip-slot:active{ transform: translateY(1px); }
 .rh-strip-slot.is-active{
   opacity: 1;
   border-color: rgba(255, 255, 255, 0.60);
 }
 
-/* 占位块：你说的默认填充色 */
+/* 占位块 */
 .rh-slot-placeholder{
   display: block;
   width: 100%;
@@ -212,16 +200,7 @@
   -webkit-user-drag: none;
 }
 
-/* 每次翻页的步进：slot 宽 + gap
-   slot 宽 = 视窗可用高度 * 16/9（因为 slot 高=100%） */
-.rh-strip-viewport{
-  --rh-thumb-step: calc((100% * (16 / 9)) + var(--rh-strip-gap));
-}
-
-/* 主图左右按钮（可选：你现在放在左侧底部，简单做） */
-
-
-/* 让箭头更明显（加粗） */
+/* 箭头更明显 */
 .rh-chevron {
   font-size: 26px;
   line-height: 1;
@@ -254,11 +233,23 @@
   box-shadow: none;
   border: none;
   background: rgba(0, 0, 0, 0.08);
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+}
+.rh-card-in-screen::-webkit-scrollbar { width: 10px; }
+.rh-card-in-screen::-webkit-scrollbar-track { background: transparent; }
+.rh-card-in-screen::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+.rh-card-in-screen::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.34);
 }
 
-.rh-card-hd {
-  margin-bottom: 14px;
-}
+.rh-card-hd { margin-bottom: 14px; }
 
 .rh-label {
   font-size: 12px;
@@ -273,9 +264,7 @@
   line-height: 1.2;
 }
 
-.rh-field {
-  margin-top: 16px;
-}
+.rh-field { margin-top: 16px; }
 
 .rh-text {
   margin: 8px 0 0;
@@ -290,7 +279,7 @@
   align-items: center;
   gap: 10px;
   padding: 5px 10px;
-  border-radius: 14px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(0, 0, 0, 0.18);
   color: rgba(255, 255, 255, 0.92);
@@ -298,7 +287,6 @@
   max-width: 100%;
   overflow: hidden;
 }
-
 .rh-link span {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -306,32 +294,12 @@
   font-size: clamp(10px, 3.5vw, 16px);
 }
 
-/* 右侧滚动条（保留你原来的美化） */
-.rh-card-in-screen {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
-}
-.rh-card-in-screen::-webkit-scrollbar { width: 10px; }
-.rh-card-in-screen::-webkit-scrollbar-track { background: transparent; }
-.rh-card-in-screen::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.22);
-  border-radius: 999px;
-  border: 3px solid transparent;
-  background-clip: padding-box;
-}
-.rh-card-in-screen::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.34);
-  border: 3px solid transparent;
-  background-clip: padding-box;
-}
-
-/* ===== 底座（原样） ===== */
+/* ===== 底座 ===== */
 .rh-stand {
   display: grid;
   place-items: center;
   margin-top: 14px;
 }
-
 .rh-stand-neck {
   width: 140px;
   height: 22px;
@@ -340,7 +308,6 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
 }
-
 .rh-stand-base {
   width: min(520px, 78%);
   height: 18px;
@@ -369,39 +336,65 @@
   z-index: 50;
 }
 
-/* ===== 设备适配：不改颜色，只改布局 ===== */
-
-/* 平板：上下布局（你原来就这样），并保持 strip 可用 */
+/* ===== 设备适配 ===== */
 @media (max-width: 1000px) {
   .rh-screen {
     max-height: none;
     aspect-ratio: auto;
     height: min(86vh, 900px);
   }
-
   .rh-screen-split {
     grid-template-columns: 1fr;
-    grid-template-rows: 1.1fr 0.9fr;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); 
   }
-
+  .rh-screen-left{
+    overflow: visible;  
+    min-height: 0;       
+  }
   .rh-screen-right {
     border-left: none;
     border-top: 1px solid rgba(255, 255, 255, 0.10);
   }
-
   .rh-strip{
-    grid-template-columns: 44px 1fr 44px;
-    gap: 10px;
+   flex: 0 0 auto;
+    height: clamp(90px, 14vh, 150px); 
+  }
+  .rh-mainshot{
+    flex: 1 1 auto;
+    min-height: 0;
+    aspect-ratio: auto; 
   }
 }
 
-/* 手机：按钮再宽一点方便点按，但仍无滚动条 */
 @media (max-width: 600px) {
-  .rh-container{
-    padding: 18px 16px 110px;
-  }
 
   .rh-strip{
-    grid-template-columns: 48px 1fr 48px;
+    grid-template-columns: 28px 1fr 28px !important; 
+    gap: 6px !important;                            
+    padding: 6px 8px 8px !important;                 
+    height: clamp(64px, 9vh, 92px) !important;       
+  }
+
+
+  .rh-strip-nav{
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 28px !important;       
+    min-width: 28px !important;    
+    height: 100% !important;
+    box-sizing: border-box;
+    border-radius: 10px;
+  }
+
+
+  .rh-chevron{
+    font-size: 16px !important;
+    font-weight: 800;
+    transform: translateY(-0.5px);
+  }
+
+  .rh-strip-viewport{
+    padding: 4px !important;
+    border-radius: 14px;
   }
 }

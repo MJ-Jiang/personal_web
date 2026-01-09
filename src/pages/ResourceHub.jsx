@@ -12,7 +12,7 @@ export default function Resourcehub() {
         id: "p1",
         name: "明星资源站",
         intro:
-          "这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。",
+          "这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。",
         websiteUrl: "https://www.txnlemonade.cn/",
         codeUrl: "https://github.com/MJ-Jiang/txning-resource",
         images: [
@@ -28,73 +28,112 @@ export default function Resourcehub() {
 
   const project = projects[0];
   const images = project?.images ?? [];
+  const realCount = images.length;
 
   // 主图索引
   const [imageIndex, setImageIndex] = useState(0);
 
-  // 每个设备默认显示多少个缩略图框：桌面4 / 平板3 / 手机2
-  const [perView, setPerView] = useState(getPerView());
-
-  // 缩略图“窗口”左边第几个开始显示
-  const [thumbStart, setThumbStart] = useState(0);
-
-  // 固定槽位
+  // 视觉上至少显示多少个槽位（不足用占位补）
   const STRIP_SLOTS = 5;
-  const totalSlots = Math.max(STRIP_SLOTS, images.length);
+  const totalSlots = Math.max(STRIP_SLOTS, realCount);
 
+  // refs
+  const viewportRef = useRef(null);
   const trackRef = useRef(null);
 
-  // 监听 resize，动态 perView
-  useEffect(() => {
-    const onResize = () => setPerView(getPerView());
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+  // 用 ref 存“步进像素”和“最大位移像素”，避免频繁 setState
+  const stepPxRef = useRef(0);
+  const maxTranslatePxRef = useRef(0);
 
-  // 当主图变化时，保证对应缩略图在可视窗口内
-  useEffect(() => {
-    setThumbStart((s) => clampStartForIndex(s, imageIndex, perView, totalSlots));
-  }, [imageIndex, perView, totalSlots]);
+  // 真实 translateX（像素）
+  const [translateX, setTranslateX] = useState(0);
 
+  // 主图
   const currentImage = images[imageIndex] ?? "";
-
   const hasPrev = imageIndex > 0;
-  const hasNext = imageIndex < images.length - 1;
+  const hasNext = imageIndex < realCount - 1;
 
   function prevImage() {
     setImageIndex((i) => Math.max(0, i - 1));
   }
+
   function nextImage() {
-    setImageIndex((i) => Math.min(images.length - 1, i + 1));
+    setImageIndex((i) => Math.min(realCount - 1, i + 1));
   }
 
-  // strip 左右：翻缩略图窗口（不是滚动条）
-  function prevThumbPage() {
-    setThumbStart((s) => Math.max(0, s - 1));
-  }
-  function nextThumbPage() {
-    const maxStart = Math.max(0, totalSlots - perView);
-    setThumbStart((s) => Math.min(maxStart, s + 1));
+  function onThumbClick(idx) {
+    if (idx >= 0 && idx < realCount) setImageIndex(idx);
   }
 
-  // 点击缩略图：只在有真实图片时切换主图
-  function onThumbClick(realIndex) {
-    if (realIndex >= 0 && realIndex < images.length) {
-      setImageIndex(realIndex);
-    }
-  }
-
-  // 主页按钮
-  const goHome = () => {
-    navigate("/", { state: { startStage: 4 } });
-  };
+  const goHome = () => navigate("/", { state: { startStage: 4 } });
 
   // 渲染槽位：真实图 or 占位
   const slots = Array.from({ length: totalSlots }, (_, i) => images[i] ?? null);
 
-  // 箭头是否可用（缩略图窗口）
-  const canThumbPrev = thumbStart > 0;
-  const canThumbNext = thumbStart < Math.max(0, totalSlots - perView);
+  // ✅ 计算 stepPx 和 maxTranslatePx（只要尺寸变化就重新算）
+  useEffect(() => {
+    const viewportEl = viewportRef.current;
+    const trackEl = trackRef.current;
+    if (!viewportEl || !trackEl) return;
+
+    const computeMetrics = () => {
+      const firstSlot = trackEl.querySelector(".rh-strip-slot");
+      if (!firstSlot) {
+        stepPxRef.current = 0;
+        maxTranslatePxRef.current = 0;
+        setTranslateX(0);
+        return;
+      }
+
+      // 1) stepPx = 一个 slot 的宽度 + gap
+      const slotW = firstSlot.getBoundingClientRect().width;
+      const styles = window.getComputedStyle(trackEl);
+      const gapStr = styles.gap || styles.columnGap || "0px";
+      const gapPx = parseFloat(gapStr) || 0;
+      const stepPx = slotW + gapPx;
+
+      // 2) maxTranslatePx = trackWidth - viewportWidth（<=0 表示不能动）
+      const viewportW = viewportEl.clientWidth;
+      const trackW = trackEl.scrollWidth;
+      const maxTranslatePx = Math.max(0, trackW - viewportW);
+
+      stepPxRef.current = stepPx;
+      maxTranslatePxRef.current = maxTranslatePx;
+
+      // 重新 clamp 一次（比如 resize 后）
+      const desired = imageIndex * stepPxRef.current;
+      const nextX = Math.min(desired, maxTranslatePxRef.current);
+      setTranslateX(nextX);
+    };
+
+    computeMetrics();
+
+    const ro = new ResizeObserver(() => computeMetrics());
+    ro.observe(viewportEl);
+    ro.observe(trackEl);
+
+    window.addEventListener("resize", computeMetrics);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", computeMetrics);
+    };
+  }, [imageIndex, totalSlots, realCount]);
+
+  // ✅ 关键：每次选中 index 变化，都按“推进一格”计算 translate
+  //    translate = imageIndex * stepPx，直到 maxTranslatePx（最后一张贴右后不再动）
+  useEffect(() => {
+    const step = stepPxRef.current;
+    const maxX = maxTranslatePxRef.current;
+
+    if (!step || maxX === 0) {
+      setTranslateX(0);
+      return;
+    }
+
+    const desired = imageIndex * step;
+    const nextX = Math.min(desired, maxX);
+    setTranslateX(nextX);
+  }, [imageIndex]);
 
   return (
     <div className="rh-page">
@@ -103,7 +142,7 @@ export default function Resourcehub() {
           <div className="rh-bezel">
             <div className="rh-screen" aria-label="电脑屏幕">
               <div className="rh-screen-split">
-                {/* 左侧：主图(16:9) + 底部 strip */}
+                {/* 左侧：主图 + strip */}
                 <div className="rh-screen-left" aria-label="项目图片">
                   <div className="rh-mainshot" aria-label="主图">
                     {currentImage ? (
@@ -119,27 +158,31 @@ export default function Resourcehub() {
                     <div className="rh-screen-gradient" />
                   </div>
 
-                  {/* 底部 strip：无滚动条，靠 transform 翻页 */}
+                  {/* 底部 strip：<> 切换 imageIndex；track 自动推进并在末尾贴右 */}
                   <div className="rh-strip" aria-label="项目图片条">
                     <button
                       type="button"
                       className="rh-strip-nav"
-                      onClick={prevThumbPage}
-                      disabled={!canThumbPrev}
-                      aria-label="上一组缩略图"
-                      title="上一组缩略图"
+                      onClick={prevImage}
+                      disabled={!hasPrev}
+                      aria-label="上一张"
+                      title="上一张"
                     >
                       <span className="rh-chevron" aria-hidden="true">
                         {"<"}
                       </span>
                     </button>
 
-                    <div className="rh-strip-viewport" aria-label="缩略图视窗">
+                    <div
+                      className="rh-strip-viewport"
+                      ref={viewportRef}
+                      aria-label="缩略图视窗"
+                    >
                       <div
                         className="rh-strip-track"
                         ref={trackRef}
                         style={{
-                          transform: `translateX(calc(-1 * var(--rh-thumb-step) * ${thumbStart}))`,
+                          transform: `translateX(-${translateX}px)`,
                         }}
                       >
                         {slots.map((src, idx) => {
@@ -159,12 +202,7 @@ export default function Resourcehub() {
                               title={isReal ? `第 ${idx + 1} 张` : "占位"}
                             >
                               {isReal ? (
-                                <img
-                                  className="rh-thumb-img"
-                                  src={src}
-                                  alt=""
-                                  draggable={false}
-                                />
+                                <img className="rh-thumb-img" src={src} alt="" draggable={false} />
                               ) : (
                                 <span className="rh-slot-placeholder" aria-hidden="true" />
                               )}
@@ -177,21 +215,19 @@ export default function Resourcehub() {
                     <button
                       type="button"
                       className="rh-strip-nav"
-                      onClick={nextThumbPage}
-                      disabled={!canThumbNext}
-                      aria-label="下一组缩略图"
-                      title="下一组缩略图"
+                      onClick={nextImage}
+                      disabled={!hasNext}
+                      aria-label="下一张"
+                      title="下一张"
                     >
                       <span className="rh-chevron" aria-hidden="true">
                         {">"}
                       </span>
                     </button>
                   </div>
-
-                
                 </div>
 
-                {/* 右侧：文字面板（可滚动） */}
+                {/* 右侧：文字面板 */}
                 <div className="rh-screen-right" aria-label="项目信息">
                   <div className="rh-card rh-card-in-screen">
                     <div className="rh-card-hd">
@@ -201,12 +237,7 @@ export default function Resourcehub() {
 
                     <div className="rh-field">
                       <div className="rh-label">网页链接</div>
-                      <a
-                        className="rh-link"
-                        href={project?.websiteUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
+                      <a className="rh-link" href={project?.websiteUrl} target="_blank" rel="noreferrer">
                         <ExternalLink size={16} />
                         <span>{project?.websiteUrl}</span>
                       </a>
@@ -214,12 +245,7 @@ export default function Resourcehub() {
 
                     <div className="rh-field">
                       <div className="rh-label">代码链接</div>
-                      <a
-                        className="rh-link"
-                        href={project?.codeUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
+                      <a className="rh-link" href={project?.codeUrl} target="_blank" rel="noreferrer">
                         <Code2 size={16} />
                         <span>{project?.codeUrl}</span>
                       </a>
@@ -235,7 +261,7 @@ export default function Resourcehub() {
             </div>
           </div>
 
-          {/* 底座（ */}
+          {/* 底座 */}
           <div className="rh-stand" aria-hidden="true">
             <div className="rh-stand-neck" />
             <div className="rh-stand-base" />
@@ -250,24 +276,4 @@ export default function Resourcehub() {
       </div>
     </div>
   );
-}
-
-/** --- helpers --- */
-function getPerView() {
-  const w = window.innerWidth;
-  if (w <= 600) return 2;       // 手机
-  if (w <= 1000) return 3;      // 平板
-  return 4;                     // 桌面
-}
-
-function clampStartForIndex(currentStart, index, perView, totalSlots) {
-  const maxStart = Math.max(0, totalSlots - perView);
-  let start = currentStart;
-
-  if (index < start) start = index;
-  if (index > start + (perView - 1)) start = index - (perView - 1);
-
-  if (start < 0) start = 0;
-  if (start > maxStart) start = maxStart;
-  return start;
 }
