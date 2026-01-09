@@ -1,54 +1,28 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+// src/components/ProjectShowcase.jsx
+import React, { useEffect, useRef, useState } from "react";
 import { Home, ExternalLink, Code2 } from "lucide-react";
-import "../pages/ResourceHub.css";
+import { useNavigate } from "react-router-dom";
+import "../Project.css";
 
-export default function Resourcehub() {
+export default function ProjectShowcase({ project }) {
   const navigate = useNavigate();
 
-  const projects = useMemo(
-    () => [
-      {
-        id: "p1",
-        name: "明星资源站",
-        intro:
-          "这里是介绍（待填写）。你可以写 2–4 句话，说明你做了什么、你的角色、以及亮点。",
-        websiteUrl: "https://www.txnlemonade.cn/",
-        codeUrl: "https://github.com/MJ-Jiang/txning-resource",
-        images: [
-          "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=1600&q=80",
-          "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80",
-          "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
-          "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1600&q=80",
-        ],
-      },
-    ],
-    []
-  );
-
-  const project = projects[0];
   const images = project?.images ?? [];
   const realCount = images.length;
 
-  // 主图索引
   const [imageIndex, setImageIndex] = useState(0);
 
-  // 视觉上至少显示多少个槽位（不足用占位补）
   const STRIP_SLOTS = 5;
   const totalSlots = Math.max(STRIP_SLOTS, realCount);
 
-  // refs
   const viewportRef = useRef(null);
   const trackRef = useRef(null);
 
-  // 用 ref 存“步进像素”和“最大位移像素”，避免频繁 setState
   const stepPxRef = useRef(0);
   const maxTranslatePxRef = useRef(0);
 
-  // 真实 translateX（像素）
   const [translateX, setTranslateX] = useState(0);
 
-  // 主图
   const currentImage = images[imageIndex] ?? "";
   const hasPrev = imageIndex > 0;
   const hasNext = imageIndex < realCount - 1;
@@ -56,21 +30,28 @@ export default function Resourcehub() {
   function prevImage() {
     setImageIndex((i) => Math.max(0, i - 1));
   }
-
   function nextImage() {
     setImageIndex((i) => Math.min(realCount - 1, i + 1));
   }
-
   function onThumbClick(idx) {
     if (idx >= 0 && idx < realCount) setImageIndex(idx);
   }
+function isHttpUrl(v) {
+  if (!v) return false;
+  const s = String(v).trim();
+  return /^https?:\/\/\S+$/i.test(s);
+}
 
   const goHome = () => navigate("/", { state: { startStage: 4 } });
 
-  // 渲染槽位：真实图 or 占位
   const slots = Array.from({ length: totalSlots }, (_, i) => images[i] ?? null);
 
-  // ✅ 计算 stepPx 和 maxTranslatePx（只要尺寸变化就重新算）
+  useEffect(() => {
+    // 换项目时，回到第 1 张 + 重置位移
+    setImageIndex(0);
+    setTranslateX(0);
+  }, [project?.id]);
+
   useEffect(() => {
     const viewportEl = viewportRef.current;
     const trackEl = trackRef.current;
@@ -85,14 +66,12 @@ export default function Resourcehub() {
         return;
       }
 
-      // 1) stepPx = 一个 slot 的宽度 + gap
       const slotW = firstSlot.getBoundingClientRect().width;
       const styles = window.getComputedStyle(trackEl);
       const gapStr = styles.gap || styles.columnGap || "0px";
       const gapPx = parseFloat(gapStr) || 0;
       const stepPx = slotW + gapPx;
 
-      // 2) maxTranslatePx = trackWidth - viewportWidth（<=0 表示不能动）
       const viewportW = viewportEl.clientWidth;
       const trackW = trackEl.scrollWidth;
       const maxTranslatePx = Math.max(0, trackW - viewportW);
@@ -100,10 +79,8 @@ export default function Resourcehub() {
       stepPxRef.current = stepPx;
       maxTranslatePxRef.current = maxTranslatePx;
 
-      // 重新 clamp 一次（比如 resize 后）
       const desired = imageIndex * stepPxRef.current;
-      const nextX = Math.min(desired, maxTranslatePxRef.current);
-      setTranslateX(nextX);
+      setTranslateX(Math.min(desired, maxTranslatePxRef.current));
     };
 
     computeMetrics();
@@ -119,8 +96,6 @@ export default function Resourcehub() {
     };
   }, [imageIndex, totalSlots, realCount]);
 
-  // ✅ 关键：每次选中 index 变化，都按“推进一格”计算 translate
-  //    translate = imageIndex * stepPx，直到 maxTranslatePx（最后一张贴右后不再动）
   useEffect(() => {
     const step = stepPxRef.current;
     const maxX = maxTranslatePxRef.current;
@@ -131,8 +106,7 @@ export default function Resourcehub() {
     }
 
     const desired = imageIndex * step;
-    const nextX = Math.min(desired, maxX);
-    setTranslateX(nextX);
+    setTranslateX(Math.min(desired, maxX));
   }, [imageIndex]);
 
   return (
@@ -158,7 +132,6 @@ export default function Resourcehub() {
                     <div className="rh-screen-gradient" />
                   </div>
 
-                  {/* 底部 strip：<> 切换 imageIndex；track 自动推进并在末尾贴右 */}
                   <div className="rh-strip" aria-label="项目图片条">
                     <button
                       type="button"
@@ -173,17 +146,11 @@ export default function Resourcehub() {
                       </span>
                     </button>
 
-                    <div
-                      className="rh-strip-viewport"
-                      ref={viewportRef}
-                      aria-label="缩略图视窗"
-                    >
+                    <div className="rh-strip-viewport" ref={viewportRef} aria-label="缩略图视窗">
                       <div
                         className="rh-strip-track"
                         ref={trackRef}
-                        style={{
-                          transform: `translateX(-${translateX}px)`,
-                        }}
+                        style={{ transform: `translateX(-${translateX}px)` }}
                       >
                         {slots.map((src, idx) => {
                           const isReal = Boolean(src);
@@ -236,12 +203,20 @@ export default function Resourcehub() {
                     </div>
 
                     <div className="rh-field">
-                      <div className="rh-label">网页链接</div>
-                      <a className="rh-link" href={project?.websiteUrl} target="_blank" rel="noreferrer">
-                        <ExternalLink size={16} />
-                        <span>{project?.websiteUrl}</span>
-                      </a>
-                    </div>
+  <div className="rh-label">网页链接</div>
+
+  {isHttpUrl(project?.websiteUrl) ? (
+    <a className="rh-link" href={project.websiteUrl} target="_blank" rel="noreferrer">
+      <ExternalLink size={16} />
+      <span>{project.websiteUrl}</span>
+    </a>
+  ) : (
+    <div className="rh-link is-text" role="note" aria-label="网页链接说明">
+      <ExternalLink size={16} />
+      <span>{project?.websiteUrl || "暂无"}</span>
+    </div>
+  )}
+</div>
 
                     <div className="rh-field">
                       <div className="rh-label">代码链接</div>

@@ -23,7 +23,7 @@
 
 /* 外框（电脑壳） */
 .rh-bezel {
-  border-radius: 26px;
+  border-radius: 14px;
   padding: 18px;
   background: aliceblue;
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -33,7 +33,7 @@
 /* 屏幕 */
 .rh-screen {
   width: 100%;
-  border-radius: 18px;
+  border-radius: 14px;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.10);
@@ -51,21 +51,32 @@
 }
 
 /* 左侧：上主图+下条 */
-.rh-screen-left {
+/* .rh-screen-left {
   position: relative;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.34);
   display: flex;
   flex-direction: column;
+} */
+.rh-screen-left{
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;  /* 防止内部把布局顶爆 */
 }
-
 /* 主图容器 */
-.rh-mainshot {
+/* .rh-mainshot {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
   flex: 0 0 auto;
+} */
+ .rh-mainshot{
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
 }
 
 .rh-screen-img {
@@ -104,15 +115,16 @@
 
 /* 底部条：左右按钮 + 视窗 */
 .rh-strip {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: 120px;
   display: grid;
   grid-template-columns: 34px 1fr 34px;
   gap: 12px;
   padding: 10px 12px 12px;
   align-items: center;
+  height: 150px;
   overflow: hidden;
-  height: clamp(90px, 18vh, 160px);
+  /* height: clamp(90px, 18vh, 160px); */
 }
 
 /* 左右按钮 */
@@ -293,7 +305,25 @@
   white-space: nowrap;
   font-size: clamp(10px, 3.5vw, 16px);
 }
-
+.rh-link,
+.rh-link:visited,
+.rh-link:hover,
+.rh-link:active {
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: none;
+}
+.rh-link:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.rh-link.is-text {
+  cursor: default;
+  user-select: text;
+}
+.rh-link.is-text:hover {
+  background: rgba(0, 0, 0, 0.18);
+  border-color: rgba(255, 255, 255, 0.14);
+}
 /* ===== 底座 ===== */
 .rh-stand {
   display: grid;
@@ -337,55 +367,111 @@
 }
 
 /* ===== 设备适配 ===== */
+
+
+/* 平板 + 手机：整台 monitor 一屏；右侧占剩余高度；右侧内部滚动 */
+/* ===== 适配：平板 + 手机（统一高度链路） ===== */
 @media (max-width: 1000px) {
-  .rh-screen {
-    max-height: none;
+  /* 统一用变量控制容器留白，monitor 高度跟着变 */
+  :root{
+    --rh-pad-y: 16px;
+    --rh-pad-x: 16px;
+  }
+
+  .rh-container{
+    padding: var(--rh-pad-y) var(--rh-pad-x) !important;
+    min-height: 100vh;
+  }
+
+  /* 整台电脑（含底座）= 一屏高度（用 dvh 更稳） */
+  .rh-monitor{
+    height: calc(100dvh - (var(--rh-pad-y) * 2)) !important;
+    max-height: calc(100dvh - (var(--rh-pad-y) * 2)) !important;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .rh-bezel{
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .rh-stand{
+    flex: 0 0 auto; /* 底座保留 */
+  }
+
+  .rh-screen{
+    height: 100% !important;
+    max-height: none !important;
     aspect-ratio: auto;
-    height: min(86vh, 900px);
   }
-  .rh-screen-split {
+
+  /* 上下布局：left 固定，right 吃剩余高度 */
+  .rh-screen-split{
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); 
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100%;
   }
+
   .rh-screen-left{
-    overflow: visible;  
-    min-height: 0;       
+    overflow: hidden;
+    min-height: 0;
   }
-  .rh-screen-right {
+
+  .rh-screen-right{
+    min-height: 0;
+    overflow: hidden; /* 不让内容撑开，把滚动交给内部卡片 */
     border-left: none;
     border-top: 1px solid rgba(255, 255, 255, 0.10);
   }
-  .rh-strip{
-   flex: 0 0 auto;
-    height: clamp(90px, 14vh, 150px); 
+
+  /* 内容少不出滚动条，内容多才滚 */
+  .rh-card-in-screen{
+    height: 100%;
+    overflow-y: auto;
   }
-  .rh-mainshot{
-    flex: 1 1 auto;
+
+  /* 缩略图条：平板高度 */
+  .rh-strip{
+    flex: 0 0 auto;
+    height: clamp(90px, 14vh, 150px);
     min-height: 0;
-    aspect-ratio: auto; 
   }
 }
 
+/* ===== 适配：手机（更大上下留白 + 更薄白壳 + 更窄箭头） ===== */
 @media (max-width: 600px) {
-
-  .rh-strip{
-    grid-template-columns: 28px 1fr 28px !important; 
-    gap: 6px !important;                            
-    padding: 6px 8px 8px !important;                 
-    height: clamp(64px, 9vh, 92px) !important;       
+  /* 只改变量即可：padding 变大，monitor 自动变矮，不会出现页面滚动条 */
+  :root{
+    --rh-pad-y: 32px;
+    --rh-pad-x: 12px;
   }
 
+  /* 白色机壳变薄 */
+  .rh-bezel{
+    padding: 10px !important;
+    border-radius: 14px !important;
+  }
+
+  /* 缩略图条更矮 + 两侧按钮更窄 */
+  .rh-strip{
+    min-height: 0 !important;
+    grid-template-columns: 24px 1fr 24px !important;
+    gap: 6px !important;
+    padding: 4px 8px 8px !important;
+    height: clamp(32px, 10vh, 92px) !important;
+  }
 
   .rh-strip-nav{
     padding: 0 !important;
     margin: 0 !important;
-    width: 28px !important;       
-    min-width: 28px !important;    
+    width: 24px !important;
+    min-width: 24px !important;
     height: 100% !important;
     box-sizing: border-box;
     border-radius: 10px;
   }
-
 
   .rh-chevron{
     font-size: 16px !important;
@@ -396,5 +482,11 @@
   .rh-strip-viewport{
     padding: 4px !important;
     border-radius: 14px;
+    height: 100%;
+  }
+
+  .rh-strip-track,
+  .rh-strip-slot{
+    height: 100%;
   }
 }
